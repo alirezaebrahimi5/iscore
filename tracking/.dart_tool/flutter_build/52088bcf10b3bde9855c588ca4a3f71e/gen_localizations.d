@@ -1,0 +1,1 @@
+ /home/alireza/Documents/iscore/iscore/tracking/.dart_tool/flutter_gen/gen_l10n/app_localizations_en.dart /home/alireza/Documents/iscore/iscore/tracking/.dart_tool/flutter_gen/gen_l10n/app_localizations.dart:  /home/alireza/Documents/iscore/iscore/tracking/l10n.yaml /home/alireza/Documents/iscore/iscore/tracking/lib/src/localization/app_en.arb

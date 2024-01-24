@@ -1,0 +1,1 @@
+ /home/alireza/Documents/iscore/iscore/tracking/.dart_tool/flutter_build/52088bcf10b3bde9855c588ca4a3f71e/native_assets.yaml: 
