@@ -16,24 +16,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class LoginUserSerializer(serializers.Serializer):
-    mobile = serializers.CharField()
-    password = serializers.CharField()
-    
-    def validate(self, data):
-        user = authenticate(**data)
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Incorrect Credentials")
+    identificationCode   = serializers.CharField()
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User 
-        fields =['identificationCode', 'mobile', 'phone', 'password', 'first_name', 'last_name',
+        fields =['identificationCode', 'mobile', 'phone', 'first_name', 'last_name',
                  'address', 'role']
-        labels = {
-            'password': 'گذر واژه',
-        }
     
     def create(self, **validated_data):
         return User.objects.create_user(**validated_data)
@@ -52,11 +42,3 @@ class UserIDSerializer(serializers.Serializer):
         if User.objects.filter(identificationCode__exact=self.identificationCode):
             return response.Response("ok", status=status.HTTP_200_OK)
         return serializers.ValidationError("!این شماره ملی ثبت نشده است")
-
-
-class PasswordSerializer(serializers.Serializer):
-    password = serializers.CharField()
-    confirm_password = serializers.CharField()
-    
-    def create(self, validated_data):
-        return User.objects.update(**validated_data)

@@ -198,13 +198,14 @@ REST_FRAMEWORK = {
     ],
     
     'DEFAULT_THROTTLE_CLASSES': [
-        'example.throttles.BurstRateThrottle',
-        'example.throttles.SustainedRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
     ],
     
     'DEFAULT_THROTTLE_RATES': {
-        'burst': '600/min',
-        'sustained': '2000/day',
+        'anon':'2/day',
+        'user':'5/hour',
+        'custom':'3/minute'
     },
     
     'DEFAULT_RENDERER_CLASSES': [

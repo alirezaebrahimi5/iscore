@@ -20,12 +20,22 @@ class UserLoginAPIView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
-        serializer = CustomUserSerializer(user)
-        token = tokens.RefreshToken.for_user(user)
-        data = serializer.data
-        data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}
-        return response.Response(data, status=status.HTTP_200_OK)
+        token = request.data.get("token")
+        
+        # TODO : calculate how much time a user sends requests
+        
+        user = serializer.data 
+        usertoken = create_OTP_token(user=user)
+        return response.Response(usertoken, status=status.HTTP_200_OK)
+
+
+class CheckOTPAPIView(generics.GenericAPIView):
+    """
+    An endpoint for users to the OTP tokens
+    """
+    
+    def put(self, request, *args, **kwargs):
+        return response.Response("", status=status.HTTP_202_ACCEPTED)
 
 
 class UserLogoutAPIView(generics.GenericAPIView):
@@ -92,50 +102,3 @@ class UserProfileAPIView(generics.RetrieveAPIView):
             return response.Response(data=data, status=status.HTTP_200_OK)
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
-
-
-####################### Reset password section #######################
-
-
-class GetUserMobileAPIView(generics.GenericAPIView):
-    """
-    An endpoint for users to send their mobile accounts
-    """
-    
-    serializer_class = [UserIDSerializer]
-    # permission_classes = []
-    
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.data 
-        create_OTP_token(user=user)
-        return response.Response(user, status=status.HTTP_200_OK)
-    
-    def get(self, request, *args, **kwargs):
-        pass
-
-
-class CheckOTPAPIView(generics.GenericAPIView):
-    """
-    An endpoint for users to the OTP tokens
-    """
-    
-    def post(self, request, *args, **kwargs):
-        pass
-
-
-class ResetPasswordAPIView(generics.GenericAPIView):
-    """
-    An endpoint for users to reset their passwords
-    """
-    
-    serializer_class = [PasswordSerializer]
-        
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer_class(data=request.data)
-        if serializer.password == serializer.confirm_password:
-            serializer.save()
-            return response.Response("done!", status=status.HTTP_205_RESET_CONTENT)
-        else:
-            return response.Response("error!", status=status.HTTP_406_NOT_ACCEPTABLE)
