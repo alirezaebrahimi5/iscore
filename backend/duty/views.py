@@ -1,6 +1,6 @@
 from rest_framework import generics, status, response
 
-from .serializers import DefineTaskSerializer, VisitorTaskSerializer
+from .serializers import *
 
 from user.permissions import *
 

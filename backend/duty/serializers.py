@@ -13,3 +13,9 @@ class VisitorTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = VisitorTask
         fields = "__all__"
+
+
+class IsTaskDoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskDone
+        fields = "__all__"
