@@ -50,7 +50,7 @@ class AnyUserLocationAPIView(generics.GenericAPIView):
 
 class AddNewLocationAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class =NewLocationSerializer
+    serializer_class = NewLocationSerializer
     
     def get(self, request, *args, **kwargs):
         return response.Response()

@@ -12,4 +12,5 @@ class ULAdmin(admin.ModelAdmin):
 @admin.register(NewLocation)
 class NLAdmin(admin.ModelAdmin):
     list_display = ['user', 'title']
+    list_filter = ['saleManagerVerified']
     search_fields = ['user', 'title']

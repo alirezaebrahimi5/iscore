@@ -27,3 +27,16 @@ class Product(models.Model):
     
     def __str__(self) -> str:
         return f"{self.title} {self.price} {self.capacity} {self.is_verified} {self.prod_type}"
+
+
+class Instance(models.Model):
+    title       = models.CharField(max_length=144)
+    img         = models.ImageField(upload_to='product/')
+    slug        = models.SlugField(allow_unicode=True)
+    price       = models.FloatField()
+    description = models.CharField(max_length=400)
+    capacity    = models.PositiveBigIntegerField()
+    prod_type   = models.PositiveSmallIntegerField(choices=ProductType.Product_Type, default=1)
+    
+    def __str__(self) -> str:
+        return f"{self.title} {self.price} {self.capacity} {self.prod_type}"
