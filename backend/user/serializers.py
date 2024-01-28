@@ -12,7 +12,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "phone", "identificationCode", "mobile", "first_name", "last_name", "address", "role")
+        fields = ("id", "phone", "identificationCode", "mobile", "first_name", "last_name",
+                  "address", "profile_pic", "role")
 
 
 class LoginUserSerializer(serializers.Serializer):
@@ -23,7 +24,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User 
         fields =['identificationCode', 'mobile', 'phone', 'first_name', 'last_name',
-                 'address', 'role']
+                 'address', "profile_pic", 'role']
     
     def create(self, **validated_data):
         return User.objects.create_user(**validated_data)
@@ -32,7 +33,7 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'phone', 'first_name', 'last_name', 'role']
+        fields = ['id', 'user', 'phone', 'first_name', 'last_name', 'role', 'pic']
 
 
 class UserIDSerializer(serializers.Serializer):
@@ -40,5 +41,5 @@ class UserIDSerializer(serializers.Serializer):
     
     def validate(self, data):
         if User.objects.filter(identificationCode__exact=self.identificationCode):
-            return response.Response("ok", status=status.HTTP_200_OK)
+            return response.Response(self.identificationCode, status=status.HTTP_200_OK)
         return serializers.ValidationError("!این شماره ملی ثبت نشده است")

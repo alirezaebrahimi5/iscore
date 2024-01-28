@@ -15,3 +15,8 @@ class Admin(UserAdmin):
     fieldsets = ()
     search_fields = ('identificationCode', 'first_name', 'last_name', 'mobile')
     ordering = ('joined_at', 'role')
+
+
+@admin.register(Profile)
+class PAdmin(admin.ModelAdmin):
+    list_display = ['user', 'mobile', 'phone', 'fullName']

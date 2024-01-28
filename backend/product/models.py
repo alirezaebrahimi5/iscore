@@ -27,13 +27,3 @@ class Product(models.Model):
     
     def __str__(self) -> str:
         return f"{self.title} {self.price} {self.capacity} {self.is_verified} {self.prod_type}"
-
-
-class Product_by_Sales_Manager(models.Model):
-    sales_manager_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    visitor_user       = models.ManyToManyField(User, on_delete=models.CASCADE)
-    product            = models.ForeignKey(Product, on_delete=models.CASCADE)
-    is_represented     = models.BooleanField(default=False)
-    
-    def __str__(self) -> str:
-        return f"{self.sales_manager_user} {self.visitor_user} {self.product} {self.is_represented}"

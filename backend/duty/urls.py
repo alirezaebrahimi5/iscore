@@ -4,5 +4,6 @@ from .views import *
 
 
 urlpatterns = [
-    path('all/tasks/', WriteTaskAPIView.as_view(), name='all-tasks'),
+    path('sale-manager/define-tasks/', SaleManagerSetTask.as_view(), name=''),
+    path('personnel-task-overview/', PersonnelTaskOverView.as_view(), name=''),
 ]

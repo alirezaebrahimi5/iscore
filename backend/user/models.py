@@ -90,6 +90,7 @@ class User(AbstractBaseUser):
     last_name          = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
     phone              = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره تماس')
     address            = models.CharField(max_length=4096, null=True, blank=True, verbose_name = '')
+    profile_pic        = models.ImageField(upload_to='user/', default='pic1.png')
     is_active          = models.BooleanField(default=False, null=False, verbose_name='وضعیت فعالیت')
     is_staff           = models.BooleanField(default=False, null=False, verbose_name='دسترسی ادمین')
     is_superuser       = models.BooleanField(default=False, null=False, verbose_name='مدیر')
@@ -121,7 +122,12 @@ class Profile(models.Model):
     phone      = models.CharField(max_length=11, verbose_name='شماره تماس')
     first_name = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
     last_name  = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
+    pic        = models.ImageField(upload_to='')
     role       = models.PositiveSmallIntegerField()
+    
+    @property
+    def fullName(self):
+        return str(self.first_name) + " " + str(self.last_name)
     
     def __str__(self) -> str:
         return f"{self.user} {self.phone} {self.mobile} {self.role}"

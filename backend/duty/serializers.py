@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from .models import DefineTask, VisitorTask, TaskDone
-
-
-class DefineTaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DefineTask
-        fields = "__all__"
+from .models import VisitorTask, VisitorTaskDone
 
 
 class VisitorTaskSerializer(serializers.ModelSerializer):
@@ -15,7 +9,7 @@ class VisitorTaskSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class IsTaskDoneSerializer(serializers.ModelSerializer):
+class TaskDoneSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TaskDone
+        model = VisitorTaskDone
         fields = "__all__"
