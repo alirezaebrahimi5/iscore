@@ -84,13 +84,13 @@ class Role:
 class User(AbstractBaseUser):
     alphanumeric       = RegexValidator(r'^[0-9a-zA-Z]*$', message='فقط نمادهای الفبایی و اعداد پذیرفته میشوند')
     numbers            = RegexValidator(r'^[0-9a]*$', message='تنها اعداد پذیرفته میشوند')
-    identificationCode = models.CharField(max_length=11, unique=True, validators=[numbers], primary_key=True)
-    mobile             = models.CharField(max_length=11, unique=True, validators=[numbers])
+    identificationCode = models.CharField(max_length=11, unique=True, validators=[numbers], primary_key=True, verbose_name='شماره ملی')
+    mobile             = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره همراه')
     first_name         = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
     last_name          = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
     phone              = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره تماس')
     address            = models.CharField(max_length=4096, null=True, blank=True, verbose_name = '')
-    profile_pic        = models.ImageField(upload_to='user/', default='pic1.png')
+    profile_pic        = models.ImageField(upload_to='user/', default='pic1.jpg')
     is_active          = models.BooleanField(default=False, null=False, verbose_name='وضعیت فعالیت')
     is_staff           = models.BooleanField(default=False, null=False, verbose_name='دسترسی ادمین')
     is_superuser       = models.BooleanField(default=False, null=False, verbose_name='مدیر')
@@ -102,8 +102,12 @@ class User(AbstractBaseUser):
     USERNAME_FIELD  = 'identificationCode'
     REQUIRED_FIELDS = ['mobile', 'phone', 'first_name', 'last_name']
     
+    @property
+    def fullName(self):
+        return str(self.first_name) + " " + str(self.last_name)
+    
     def __str__(self) -> str:
-        return f"{self.identificationCode} {self.first_name} {self.last_name} {self.mobile} {self.role}"
+        return f"{self.identificationCode} {self.fullName} {self.mobile} {self.role}"
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -122,7 +126,7 @@ class Profile(models.Model):
     phone      = models.CharField(max_length=11, verbose_name='شماره تماس')
     first_name = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
     last_name  = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
-    pic        = models.ImageField(upload_to='')
+    pic        = models.ImageField(upload_to='profile/')
     role       = models.PositiveSmallIntegerField()
     
     @property
