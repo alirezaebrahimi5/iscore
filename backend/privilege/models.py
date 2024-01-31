@@ -18,6 +18,14 @@ class UserTime(models.Model):
         ordering = ['-created_at']
 
 
+class Score(models.Model):
+    title = models.CharField(max_length=50, unique=True, primary_key=True)
+    score = models.PositiveIntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.title} {self.score}"
+
+
 class UserGivenScore(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     today_time =  models.DurationField(null=True, blank=True)

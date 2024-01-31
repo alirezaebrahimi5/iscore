@@ -40,7 +40,7 @@ class AllUsersLatestLocationsAPIView(generics.GenericAPIView):
 
 class AnyUserLocationAPIView(generics.GenericAPIView):
     """
-    An endpoint for Sale managers to 
+    An endpoint for Sale managers to see each Users location individually
     """
     permission_classes = [IsManagementUser, IsSales_ManagerUser]
     serializer_class = LocationSerializer
@@ -93,7 +93,7 @@ class VerifyLocation(generics.GenericAPIView):
     def perform_create(self, serializer):
         return self.serializer(user=self.request.user.id)
     
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         ls = NewLocationSerializer(data=request.data)
         if ls.is_valid():
             ls.data["saleManagerVerified"] = True

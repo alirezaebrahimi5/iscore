@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import UserTime, ScoreComputation, UserGivenScore
+from .models import UserTime, Score, UserGivenScore
 
 
 @admin.register(UserTime)
@@ -9,9 +9,9 @@ class UTAdmin(admin.ModelAdmin):
     search_fields = ['user']
 
 
-@admin.register(ScoreComputation)
+@admin.register(Score)
 class SCAdmin(admin.ModelAdmin):
-    list_display = ['base_score', 'score_increment']
+    list_display = ['title', 'score']
 
 
 @admin.register(UserGivenScore)
