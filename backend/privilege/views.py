@@ -14,9 +14,22 @@ class ChooseScore(generics.GenericAPIView):
     serializer_class = [ScoreSerializer]
     
     def post(self, request, *args, **kwargs):
-        pass
+        s = ScoreSerializer(data=request.data)
+        if s.is_valid():
+            s.save()
+            return response.Response(s.data, status=status.HTTP_201_CREATED)
+        else:
+            return response.Response(s.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
     
     def put(self, request, title, *args, **kwargs):
+        s = ScoreSerializer(data=request.data)
+        if s.is_valid():
+            s.save()
+            return response.Response(s.data, status=status.HTTP_201_CREATED)
+        else:
+            return response.Response(s.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+    
+    def get(self, request, *args, **kwargs):
         pass
 
 
@@ -28,7 +41,8 @@ class UserDailyWorkAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request, pk, *args, **kwargs):
-        return response.Response() 
+        s = UserTimeSerializer(data=request.data)
+        return response.Response(s.data, status=status.HTTP_200_OK) 
     
     def get(self, request, *args, **kwargs):
         return response.Response()

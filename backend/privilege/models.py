@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 User = settings.AUTH_USER_MODEL
@@ -22,6 +21,14 @@ class Score(models.Model):
     title = models.CharField(max_length=50, unique=True, primary_key=True)
     score = models.PositiveIntegerField()
 
+    def __str__(self) -> str:
+        return f"{self.title} {self.score}"
+
+
+class SpecialScore(models.Model):
+    title = models.CharField(max_length=50, unique=True, primary_key=True)
+    score = models.PositiveIntegerField()
+    
     def __str__(self) -> str:
         return f"{self.title} {self.score}"
 

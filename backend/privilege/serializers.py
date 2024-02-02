@@ -1,11 +1,17 @@
 from rest_framework import serializers
 
-from .models import UserTime, UserGivenScore, Score
+from .models import *
 
 
 class ScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Score 
+        fields = "__all__"
+
+
+class ScoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialScore 
         fields = "__all__"
 
 
