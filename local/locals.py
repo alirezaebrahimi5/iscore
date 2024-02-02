@@ -65,17 +65,16 @@ def login():
             if login_user(user):
                   return jsonify(user)
             else:
-                  return jsonify("user has no password")
-            
+                  return jsonify("Error")
 
 
-@app.route("product/<integer:id>/", methods=['GET'])
+@app.route("product/<integer:id>/", methods=['GET', 'POST'])
 def getProduct(id, user):
       return jsonify()
 
 
-@app.route("", methods=["POST"])
-def searchProduct():
+@app.route("", methods=["POST", "GET"])
+def searchProduct(id):
       if request.method == "":
             return jsonify()
 
