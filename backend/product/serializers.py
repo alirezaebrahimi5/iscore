@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Product, Instance
+from .models import *
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -9,7 +9,13 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class InstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instance
+        fields = "__all__"
+
+
+class FactorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Factor
         fields = "__all__"

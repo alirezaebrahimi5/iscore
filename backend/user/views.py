@@ -1,7 +1,8 @@
-from rest_framework import permissions, response, status, generics
+from rest_framework import permissions, response, status, generics, filters
 from rest_framework_simplejwt import tokens
 
 from .models import User 
+from .permissions import *
 from .serializers import *
 from .utils import *
 
@@ -102,3 +103,17 @@ class UserProfileAPIView(generics.RetrieveAPIView):
             return response.Response(data=data, status=status.HTTP_200_OK)
         except Exception as e:
             return response.Response(status=status.HTTP_404_NOT_FOUND)
+
+
+############################ Sale managers ############################
+
+
+class SeeAllPersonnelAPIView(generics.GenericAPIView):
+    """
+    An endpoint for Sale managers to see the other users info
+    """
+    
+    permission_classes = [IsSales_ManagerUser, IsManagementUser]
+    serializer_class = [CustomUserSerializer]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['identificationCode', 'mobile', 'fullName', 'phone']

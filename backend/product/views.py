@@ -1,13 +1,17 @@
-from rest_framework import generics, permissions, status, response
+from rest_framework import generics, permissions, status, response, filters
 
+from .models import Product
 from .serializers import *
 
 from user.permissions import *
 
 
+############################## Sale managers concern ##############################
+
+
 class SaleManagerCreateProductAPIView(generics.GenericAPIView):
     """
-    An endpoint for Sale manager to create a Product by its own
+    An endpoint for Sale managers to create a Product by its own
     """
     permission_classes = [IsSales_ManagerUser, IsManagementUser]
     serializer_class = ProductSerializer
@@ -28,6 +32,23 @@ class SaleManagerCreateProductAPIView(generics.GenericAPIView):
         pass
 
 
+class SaleManagerVerifiedProduct(generics.GenericAPIView):
+    """
+    An endpoint for Sale managers to verify a product that has been created by Visitors
+    """
+    permission_classes = []
+    serializer_class = []
+    
+    def perform_create(self, serializer):
+        return self.serializer(user=self.request.user.id)
+    
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+############################## Visitors concern ##############################
+
+
 class VisitorCreatProductAPIView(generics.GenericAPIView):
     """
     An endpoint for Visitors to create a product and inform Sale managers
@@ -43,6 +64,28 @@ class VisitorCreatProductAPIView(generics.GenericAPIView):
         if ps.is_valid():
             ps.save()
             return response.Response(ps.data, status=status.HTTP_201_CREATED)
+    
+    def get(self, request, *args, **kwargs):
+        pass
+
+
+class SearchProduct(generics.ListAPIView):
+    """
+    An endpoint for Users to find specific products
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = [ProductSerializer]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'prod_type', 'is_exisited', 'is_verified', 'price', 'capacity']
+
+
+class AllInstanceAPIView(generics.GenericAPIView):
+    """
+    An endpoint for Visitors to show exsiting instnaces
+    """
+    permission_classes = [IsVisitorUser, IsMEDREP_VisitorUser, IsConsultantUser]
+    queryset = Product.objects.filter(is_verified=True).filter(is_exisited=True)
+    serializer_class = [InstanceSerializer]
     
     def get(self, request, *args, **kwargs):
         pass

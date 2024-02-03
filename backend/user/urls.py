@@ -12,4 +12,5 @@ urlpatterns = [
     path('register/', UserRegisterAPIView.as_view(), name='register'),
     path('logout/', UserLogoutAPIView.as_view(), name='logout'),
     path('profile/', UserProfileAPIView.as_view(), name='profile'),
+    path('sale-manager-access-users/', SeeAllPersonnelAPIView.as_view()),
 ]
