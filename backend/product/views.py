@@ -22,11 +22,17 @@ class SaleManagerCreateProductAPIView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         ps = ProductSerializer(data=request.data)
         if ps.is_valid():
-            ps.save(is_verified=True)
+            ps.save()
             return response.Response(ps.data, status=status.HTTP_201_CREATED)
     
-    def put(self, request, *args, **kwargs):
-        pass
+    def put(self, request, title, *args, **kwargs):
+        p = Product.objects.get(title=title)
+        ps = ProductSerializer(instance=p, data=request.data)
+        if ps.is_valid():
+            ps.save()
+            return response.Response(ps.data, status=status.HTTP_205_RESET_CONTENT)
+        else:
+            return response.Response(ps.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
     
     def get(self, request, *args, **kwargs):
         pass
@@ -36,14 +42,20 @@ class SaleManagerVerifiedProduct(generics.GenericAPIView):
     """
     An endpoint for Sale managers to verify a product that has been created by Visitors
     """
-    permission_classes = []
-    serializer_class = []
+    permission_classes = [IsManagementUser, IsSales_ManagerUser]
+    serializer_class = [ProductSerializer]
     
     def perform_create(self, serializer):
         return self.serializer(user=self.request.user.id)
     
-    def post(self, request, *args, **kwargs):
-        pass
+    def put(self, request, title, *args, **kwargs):
+        p = Product.objects.get(title=title)
+        ps = ProductSerializer(instance=p, data=request.data)
+        if ps.is_valid():
+            ps.save()
+            return response.Response(ps.data, status=status.HTTP_205_RESET_CONTENT)
+        else:
+            return response.Response(ps.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 ############################## Visitors concern ##############################
@@ -84,8 +96,8 @@ class AllInstanceAPIView(generics.GenericAPIView):
     An endpoint for Visitors to show exsiting instnaces
     """
     permission_classes = [IsVisitorUser, IsMEDREP_VisitorUser, IsConsultantUser]
-    queryset = Product.objects.filter(is_verified=True).filter(is_exisited=True)
+    # queryset = Product.objects.filter(is_verified=True).filter(is_exisited=True)
     serializer_class = [InstanceSerializer]
     
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         pass

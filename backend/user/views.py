@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import permissions, response, status, generics, filters
 from rest_framework_simplejwt import tokens
 
@@ -5,6 +7,9 @@ from .models import User
 from .permissions import *
 from .serializers import *
 from .utils import *
+
+
+OTP = settings.OTP_SECRET_KEY
 
 
 ####################### Authentication section #######################

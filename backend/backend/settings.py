@@ -15,6 +15,9 @@ from datetime import timedelta
 from django.conf import settings
 import locale
 
+import mongoengine
+mongoengine.connect(db='', host='', username='', password='')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,13 +47,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    "django_mongoengine",
+    "django",
+    
     'rest_framework',
     'rest_framework_simplejwt',
     
     'django_filters',
     
-    'django_celery_beat',
-    'django_celery_results',
+    # 'django_celery_beat',
+    # 'django_celery_results',
     
     # 'sslserver',
     
@@ -176,17 +182,17 @@ DATABASES = {
         'USER': 'postgres',
         'HOST': 'localhost',
         # TODO : change the password before test it!
-        'PASSWORD': '12345',
-        'PORT': '2345',
+        'PASSWORD': 'mehdi#12345',
     },
     # TODO: use Mongodb to store data, that comes from GEOLocation via API call
     'locations': {
         'ENGINE': 'djongo',
         'NAME': 'location_db',
-        'USER': 'dj_mongo',
+        'USER': 'root',
         'HOST': 'localhost',
+        'ENFORCE_SCHEMA': False,
         # TODO : change the password before test it!
-        'PASSWORD': '12345',
+        # 'PASSWORD': '12345',
         'PORT': '27017',
     },
 }
@@ -232,8 +238,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -272,6 +278,11 @@ SIMPLE_JWT = {
 }
 
 
+# TODO : SECURITY WARNING: keep the secret key used in production secret!
+OTP_SECRET_KEY = 'otp-django-insecure-9ywcq43u5ermba3Vf#+i502$bs=uymzbl0v)^4x7j1t1d8v&uH'
+
+
+# TODO : Uncomment these lines when docker-compose running
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
 # SECURE_BROWSER_XSS_FILTER = True

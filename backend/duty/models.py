@@ -9,8 +9,8 @@ User = settings.AUTH_USER_MODEL
 
 class VisitorTask(models.Model):
     sale_manager = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saleManager")
-    user         = models.ManyToManyField(User, on_delete=models.CASCADE, null=True, blank=True, related_name="visitor")
-    tasks        = models.ManyToManyField(Product, on_delete=models.CASCADE)
+    user         = models.ManyToManyField(User, related_name="visitor")
+    tasks        = models.ManyToManyField(Product)
     start_at     = models.DateField(null=True, blank=True)
     end_at       = models.DateField(null=True, blank=True)
     

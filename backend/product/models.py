@@ -45,7 +45,7 @@ class Instance(models.Model):
 
 class Factor(models.Model):
     user          = models.ForeignKey(User, on_delete=models.CASCADE, related_name="users", verbose_name='')
-    product       = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="products", verbose_name='')
+    product       = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product", verbose_name='')
     purchaser     = models.CharField(max_length=50, verbose_name='')
     price         = models.FloatField(verbose_name='')
     description   = models.CharField(max_length=500, verbose_name='')
