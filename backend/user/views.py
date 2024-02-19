@@ -12,7 +12,7 @@ from .utils import *
 OTP_SECRET = settings.OTP_SECRET_KEY
 
 
-####################### Authentication section #######################
+####################### TODO : Authentication section #######################
 
 
 class UserLoginAPIView(generics.GenericAPIView):
@@ -77,28 +77,6 @@ class UserLogoutAPIView(generics.GenericAPIView):
             return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserRegisterAPIView(generics.CreateAPIView):
-    """
-    An endpoint to register a user
-    """
-    
-    serializer_class = [UserRegisterationSerializer]
-    
-    # permission_classes = []
-    
-    def get(self, request, *args, **kwargs):
-        pass
-    
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        token = tokens.RefreshToken.for_user(user)
-        data = serializer.data
-        data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}
-        return response.Response(data, status=status.HTTP_201_CREATED)
-
-
 class UserProfileAPIView(generics.RetrieveAPIView):
     """
     An endpoint for users to see their profiles
@@ -123,7 +101,130 @@ class UserProfileAPIView(generics.RetrieveAPIView):
             return response.Response(status=status.HTTP_404_NOT_FOUND)
 
 
-############################ Sale managers ############################
+####################### TODO : Registration section #######################
+
+
+class UserRegisterAPIView(generics.CreateAPIView):
+    """
+    An endpoint to register a user
+    """
+    
+    serializer_class = [UserRegisterationSerializer]
+    
+    # permission_classes = []
+    
+    def get(self, request, *args, **kwargs):
+        pass
+    
+    def post(self, request, *args, **kwargs):
+        s = UserRegisterationSerializer(data=request.data)
+        if s.is_valid():
+            s.save()
+            otp = sendToken(user=s.data)
+            user = User.objects.get(phone=s.validated_data["phone"])
+            OTP.objects.create(user=user, otp=otp).save()
+            return response.Response(data=s.data, status=status.HTTP_201_CREATED)
+        else:
+            return response.Response(data=s.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class ActivateAccountAPIView(generics.GenericAPIView):
+    """
+    An endpoint to activate their account via OTP 
+    """
+    permission_classes = []
+    serializer_class = [OTPSerializer]
+    
+    def post(self, request, *args, **kwargs):
+        s = OTPSerializer(data=request.data)
+        if s.is_valid():
+            otp = s.validated_data["otp"]
+            if OTP.objects.get(otp=otp):
+                # TODO : `uo` is stand for User OTP
+                uo = OTP.objects.get(otp=otp)
+                user = User.objects.get(phone=uo)
+                token = tokens.RefreshToken.for_user(user)
+                # TODO : Activating the User
+                user.is_active = True
+                user.save()
+                data = s.data
+                data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}                
+                uo.delete()
+                return response.Response(data, status=status.HTTP_205_RESET_CONTENT)
+            else:
+                return response.Response(s.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+        else:
+            return response.Response(s.errors, status=status.HTTP_408_REQUEST_TIMEOUT)
+
+
+####################### TODO : Password Reset section #######################
+
+
+class GetUserIDNAPIView(generics.GenericAPIView):
+    """
+    An endpoint to get User identification code
+    """
+    permission_classes = []
+    serializer_class = [UserIDSerializer]
+    
+    def get(self, request, *args, **kwargs):
+        return response.Response()
+    
+    def post(self, request, *args, **kwargs):
+        s = UserIDSerializer(data=request.data)
+        if s.is_valid():
+            idn = s.validated_data["identificationCode"]
+            user = User.objects.get(identificationCode=idn)
+            if user is not None:
+                otp = sendToken(user=user)
+                OTP.objects.create(user=user,otp=otp).save()
+                return response.Response(data=s.data, status=status.HTTP_200_OK)
+            else:
+                return response.Response(data="User does not exists!", status=status.HTTP_404_NOT_FOUND)
+        else:
+            return response.Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyOTPAPIView(generics.GenericAPIView):
+    """
+    An endpoint to make sure users OTP for reset password
+    """    
+    permission_classes = []
+    serializer_class = [OTPSerializer]
+    
+    def get(self, request, *args, **kwargs):
+        return response.Response()
+    
+    def post(self, request, *args, **kwargs):
+        s = OTPSerializer(data=request.data)
+        if s.is_valid():
+            otp = s.validated_data["otp"]
+            if OTP.objects.get(otp=otp):
+                user_otp = OTP.objects.get(otp=otp)
+                user_otp.delete()
+                return response.Response(data=s.data, status=status.HTTP_200_OK)
+            else:
+                return response.Response("OTP has been expired or used before", status=status.HTTP_408_REQUEST_TIMEOUT)
+        else:
+            return response.Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetPasswordConfirmAPIView(generics.GenericAPIView):
+    """
+    An endpoint for Users to reset their password
+    """
+    permission_classes = []
+    serializer_class = [ResetPassowrdSerializer]
+    
+    def get(self, request, *args, **kwargs):
+        return response.Response()
+    
+    def post(self, request, *args, **kwargs):
+        s = ResetPassowrdSerializer(data=request.data)
+        return response.Response()
+
+
+############################ TODO : Sale managers ############################
 
 
 class SeeAllPersonnelAPIView(generics.GenericAPIView):

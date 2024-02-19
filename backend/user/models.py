@@ -107,7 +107,7 @@ class User(AbstractBaseUser):
         return str(self.first_name) + " " + str(self.last_name)
     
     def __str__(self) -> str:
-        return f"{self.identificationCode} {self.fullName} {self.mobile} {self.role}"
+        return f"{self.identificationCode}"
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"

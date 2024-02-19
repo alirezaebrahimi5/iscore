@@ -52,3 +52,11 @@ class UserIDSerializer(serializers.Serializer):
         if User.objects.filter(identificationCode__exact=self.identificationCode):
             return response.Response(self.identificationCode, status=status.HTTP_200_OK)
         return serializers.ValidationError("!این شماره ملی ثبت نشده است")
+
+
+class ResetPassowrdSerializer(serializers.Serializer):
+    """
+    Serializer class for entring the password and confirm one
+    """
+    password         = serializers.CharField(write_only=True, required=True, help_text='Leave empty if no change needed', style={'input_type': 'password', 'placeholder': '••••••••••••'})
+    confirm_password = serializers.CharField(write_only=True, required=True, help_text='Leave empty if no change needed', style={'input_type': 'password', 'placeholder': '••••••••••••'})

@@ -12,11 +12,11 @@ def sendToken(user):
     
     print(f"The OTP is : {otp}")
     
-    # TODO : send a SMS to User's verified Phone number
+    # TODO : send a SMS to User's verified Mobile number
 
     # sms = SmsIr(api_key="", linenumber="09123456789")
 
-    # sms.send_sms(number=user.phone, message="""
+    # sms.send_sms(number=user.mobile, message="""
     #             کد تایید شما در سامانه
     #         """, linenumber="09123456789")
     
