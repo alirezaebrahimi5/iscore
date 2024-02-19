@@ -1,23 +1,17 @@
-from rest_framework import serializers
+from rest_framework_mongoengine import serializers
 
 from .models import UserLocation, NewLocation
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.DocumentSerializer):
     class Meta:
         model = UserLocation
         fields = '__all__'
-        exclude = ('created_at',)
-        
-        def create(self, validated_data):
-            return UserLocation.objects.using("locations").create(**validated_data)
+        # exclude = ('created_at',)
 
 
-class NewLocationSerializer(serializers.ModelSerializer):
+class NewLocationSerializer(serializers.DocumentSerializer):
     class Meta:
         model = NewLocation
         fields = "__all__"
-        exclude = ()
-        
-        def create(self, validated_data):
-            return NewLocation.objects.create(**validated_data)
+        # exclude = ('user',)

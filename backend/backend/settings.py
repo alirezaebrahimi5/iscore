@@ -14,9 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 from django.conf import settings
 import locale
-
 import mongoengine
-mongoengine.connect(db='', host='', username='', password='')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     "django_mongoengine",
-    "django",
+    "rest_framework_mongoengine",
     
     'rest_framework',
     'rest_framework_simplejwt',
@@ -170,7 +168,7 @@ LOGIN_REDIRECT_URL = 'user/profile/'
 AUTH_USER_MODEL = "user.User"
 
 
-# Celery settings
+# TODO : Celery settings
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
@@ -185,17 +183,26 @@ DATABASES = {
         'PASSWORD': 'mehdi#12345',
     },
     # TODO: use Mongodb to store data, that comes from GEOLocation via API call
-    'locations': {
-        'ENGINE': 'djongo',
-        'NAME': 'location_db',
-        'USER': 'root',
-        'HOST': 'localhost',
-        'ENFORCE_SCHEMA': False,
-        # TODO : change the password before test it!
-        # 'PASSWORD': '12345',
-        'PORT': '27017',
-    },
+    # 'locations': {
+    #     'ENGINE': 'djongo',
+    #     'NAME': 'location_db',
+    #     'USER': 'root',
+    #     'HOST': 'localhost',
+    #     'ENFORCE_SCHEMA': False,
+    #     # TODO : change the password before test it!
+    #     # 'PASSWORD': '12345',
+    #     'PORT': '27017',
+    # },
 }
+
+
+# TODO : MONGODB configurations
+MONGO_USER = 'mongouser'
+MONGO_PASS = 'password'
+MONGO_HOST = 'locahost'
+MONGO_NAME = 'themongodb'
+MONGO_DATABASE_HOST = '''mongodb://%s:%s@%s/%s''' % (MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_NAME)
+mongoengine.connect(MONGO_NAME, host=MONGO_DATABASE_HOST)
 
 
 REST_FRAMEWORK = {
@@ -238,7 +245,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -266,8 +273,8 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=7),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=30),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",

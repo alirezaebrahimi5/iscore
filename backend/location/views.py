@@ -1,4 +1,5 @@
 from rest_framework import response, generics, status, permissions
+from rest_framework_mongoengine import viewsets
 
 from .models import UserLocation, NewLocation
 from .serializers import LocationSerializer, NewLocationSerializer
@@ -6,7 +7,7 @@ from .serializers import LocationSerializer, NewLocationSerializer
 from user.permissions import *
 
 
-class AllUsersAllLocationsAPIView(generics.GenericAPIView):
+class AllUsersAllLocationsAPIView(viewsets.GenericAPIView):
     """
     An endpoint for Sale manager to see all User's location
     """
@@ -14,6 +15,7 @@ class AllUsersAllLocationsAPIView(generics.GenericAPIView):
     serializer_class = LocationSerializer
     
     def post(self, request, *args, **kwargs):
+        # TODO : All User's current locations
         all_u_l = UserLocation.objects.all()
         serializer_u_l = LocationSerializer(all_u_l, many=True)
         return response.Response(serializer_u_l.data, status=status.HTTP_200_OK)
@@ -22,7 +24,7 @@ class AllUsersAllLocationsAPIView(generics.GenericAPIView):
         pass
 
 
-class AllUsersLatestLocationsAPIView(generics.GenericAPIView):
+class AllUsersLatestLocationsAPIView(viewsets.GenericAPIView):
     """
     An endpoint for Sale manager to see latest location of any Users
     """
@@ -30,7 +32,7 @@ class AllUsersLatestLocationsAPIView(generics.GenericAPIView):
     serializer_class = LocationSerializer
     
     def get(self, request, *args, **kwargs):
-        all_u_l = UserLocation.objects.all().latest()
+        all_u_l = UserLocation.objects()
         serializer_u_l = LocationSerializer(all_u_l, many=True)
         return response.Response(serializer_u_l.data, status=status.HTTP_200_OK)
     
@@ -38,7 +40,7 @@ class AllUsersLatestLocationsAPIView(generics.GenericAPIView):
         pass
 
 
-class AnyUserLocationAPIView(generics.GenericAPIView):
+class AnyUserLocationAPIView(viewsets.GenericAPIView):
     """
     An endpoint for Sale managers to see each Users location individually
     """
@@ -60,7 +62,7 @@ class AnyUserLocationAPIView(generics.GenericAPIView):
         pass
 
 
-class AddNewLocationAPIView(generics.GenericAPIView):
+class AddNewLocationAPIView(viewsets.GenericAPIView):
     """
     An endpoint for Users to enter the new location that has been found
     """
@@ -70,7 +72,7 @@ class AddNewLocationAPIView(generics.GenericAPIView):
     def perform_create(self, serializer):
         return self.serializer(user=self.request.user.id)
     
-    def post(self, request, pk, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         ls = NewLocationSerializer(data=request.data)
         if ls.is_valid():
             ls.save()
@@ -83,7 +85,7 @@ class AddNewLocationAPIView(generics.GenericAPIView):
         pass
 
 
-class VerifyLocation(generics.GenericAPIView):
+class VerifyLocation(viewsets.GenericAPIView):
     """
     An endpoint for Sale manager to verify the new location
     """
@@ -93,10 +95,11 @@ class VerifyLocation(generics.GenericAPIView):
     def perform_create(self, serializer):
         return self.serializer(user=self.request.user.id)
     
-    def put(self, request, *args, **kwargs):
-        ls = NewLocationSerializer(data=request.data)
+    def put(self, request, pk, *args, **kwargs):
+        il = NewLocation._object_key.fget(pk=pk)
+        ls = NewLocationSerializer(instance=il, data=request.data)
         if ls.is_valid():
-            ls.data["saleManagerVerified"] = True
+            ls.data["is_verified"] = True
             ls.save()
         return response.Response(ls.data, status=status.HTTP_205_RESET_CONTENT)
     

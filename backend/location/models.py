@@ -1,6 +1,6 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import RegexValidator
+
+from mongoengine import *
 
 
 User = settings.AUTH_USER_MODEL
@@ -16,33 +16,19 @@ class LocationType:
     )
 
 
-class UserLocation(models.Model):
-    numbers     = RegexValidator(r'^[0-9a]*$', message='تنها اعداد پذیرفته میشوند')
-    user        = models.ForeignKey(User, on_delete=models.CASCADE)
-    latitude    = models.CharField(validators=[numbers], max_length=20)
-    longitude   = models.CharField(validators=[numbers], max_length=20)
-    created_at  = models.DateTimeField(auto_now=True)
+class UserLocation(DynamicDocument):
+    # TODO : where is on_delete option?
+    user      = fields.ReferenceField(User)
+    latitude  = fields.StringField(regex=r'^[0-9a]*$', max_length=11)
+    longitude = fields.StringField(regex=r'^[0-9a]*$', max_length=11)
     
-    @property
-    def where_is(self):
-        return '(' + str(self.latitude) + ',' + str(self.longitude) + ')'
-    
-    def __str__(self) -> str:
-        return f"{self.user} {self.where_is}"
-    
-    class Meta:
-        ordering = ['user']
+    def __str__(self):
+        return f"{self.user}"
 
 
-class NewLocation(models.Model):
-    numbers             = RegexValidator(r'^[0-9a]*$', message='تنها اعداد پذیرفته میشوند')
-    user                = models.ForeignKey(User, on_delete=models.CASCADE)
-    title               = models.CharField(max_length=144)
-    lat                 = models.CharField(validators=[numbers], max_length=20)
-    log                 = models.CharField(validators=[numbers], max_length=20)
-    address             = models.CharField(max_length=4096)
-    location_type       = models.PositiveSmallIntegerField(choices=LocationType.Location_Type, default=1)
-    saleManagerVerified = models.BooleanField(default=False)
-    
-    def __str__(self) -> str:
-        return f"{self.user} {self.title} {self.saleManagerVerified}"
+class NewLocation(DynamicDocument):
+    title     = fields.StringField(regex=r'^[0-9a-zA-Z]*$', max_length=140)
+    latitude  = fields.StringField(regex=r'^[0-9a]*$', max_length=11)
+    longitude = fields.StringField(regex=r'^[0-9a]*$', max_length=11)
+    is_verified = fields.BooleanField(default=False)
+    type_of     = fields.StringField(choices=LocationType.Location_Type, default=1)
