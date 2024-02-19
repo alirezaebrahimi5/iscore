@@ -84,7 +84,7 @@ class Role:
 class User(AbstractBaseUser):
     alphanumeric       = RegexValidator(r'^[0-9a-zA-Z]*$', message='فقط نمادهای الفبایی و اعداد پذیرفته میشوند')
     numbers            = RegexValidator(r'^[0-9a]*$', message='تنها اعداد پذیرفته میشوند')
-    identificationCode = models.CharField(max_length=11, unique=True, validators=[numbers], primary_key=True, verbose_name='شماره ملی')
+    identificationCode = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره ملی')
     mobile             = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره همراه')
     first_name         = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
     last_name          = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
@@ -118,6 +118,14 @@ class User(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+
+class OTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_otp")
+    otp  = models.CharField(max_length=6, unique=True)
+    
+    def __str__(self) -> str:
+        return f"{self.user}"
 
 
 class Profile(models.Model):

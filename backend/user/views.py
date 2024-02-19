@@ -3,13 +3,13 @@ from django.conf import settings
 from rest_framework import permissions, response, status, generics, filters
 from rest_framework_simplejwt import tokens
 
-from .models import User 
+from .models import User, OTP
 from .permissions import *
 from .serializers import *
 from .utils import *
 
 
-OTP = settings.OTP_SECRET_KEY
+OTP_SECRET = settings.OTP_SECRET_KEY
 
 
 ####################### Authentication section #######################
@@ -21,27 +21,40 @@ class UserLoginAPIView(generics.GenericAPIView):
     """
     
     permission_classes = (permissions.AllowAny,)
-    serializer_class = LoginUserSerializer
+    serializer_class = [LoginUserSerializer]
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        token = request.data.get("token")
-        
-        # TODO : calculate how much time a user sends requests
-        
-        user = serializer.data 
-        usertoken = create_OTP_token(user=user)
-        return response.Response(usertoken, status=status.HTTP_200_OK)
+        s = LoginUserSerializer(data=request.data)
+        if s.is_valid():
+            idn = s.validated_data["identificationCode"]
+            user = User.objects.get(identificationCode=idn)
+            otp_token = sendToken(user=user)
+            OTP.objects.create(user=user,otp=otp_token).save()
+        return response.Response(s.data, status=status.HTTP_200_OK)
 
 
 class CheckOTPAPIView(generics.GenericAPIView):
     """
-    An endpoint for users to the OTP tokens
+    An endpoint for users to send their OTP tokens
     """
     
-    def put(self, request, *args, **kwargs):
-        return response.Response("", status=status.HTTP_202_ACCEPTED)
+    def post(self, request, *args, **kwargs):
+        s = OTPSerializer(data=request.data)
+        if s.is_valid():
+            otp = s.validated_data["otp"]
+            if OTP.objects.get(otp=otp):
+                # TODO : `uo` is stands for User OTP
+                uo = OTP.objects.get(otp=otp)
+                user = User.objects.get(phone=uo.user)
+                token = tokens.RefreshToken.for_user(user)
+                data = s.data
+                data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}                
+                uo.delete()
+                return response.Response(data, status=status.HTTP_205_RESET_CONTENT)
+            else:
+                return response.Response(s.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+        else:
+            return response.Response(s.errors, status=status.HTTP_408_REQUEST_TIMEOUT)
 
 
 class UserLogoutAPIView(generics.GenericAPIView):
