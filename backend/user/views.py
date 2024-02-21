@@ -7,7 +7,7 @@ from .models import User, OTP
 from .permissions import *
 from .serializers import *
 from .utils import *
-
+from .tasks import deleteOTP
 
 OTP_SECRET = settings.OTP_SECRET_KEY
 
@@ -39,6 +39,7 @@ class CheckOTPAPIView(generics.GenericAPIView):
     """
     
     def post(self, request, *args, **kwargs):
+        deleteOTP(request.user)
         s = OTPSerializer(data=request.data)
         if s.is_valid():
             otp = s.validated_data["otp"]
@@ -136,6 +137,7 @@ class ActivateAccountAPIView(generics.GenericAPIView):
     serializer_class = [OTPSerializer]
     
     def post(self, request, *args, **kwargs):
+        deleteOTP(request.user)
         s = OTPSerializer(data=request.data)
         if s.is_valid():
             otp = s.validated_data["otp"]
