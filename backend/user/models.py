@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
-from django_jalali.db import models as jmodels
+# from django_jalali.db import models as jmodels
 
 
 class AllUser(BaseUserManager):
@@ -95,7 +95,7 @@ class User(AbstractBaseUser):
     is_staff           = models.BooleanField(default=False, null=False, verbose_name='دسترسی ادمین')
     is_superuser       = models.BooleanField(default=False, null=False, verbose_name='مدیر')
     role               = models.PositiveSmallIntegerField(choices=Role.ROLES, default=7)
-    joined_at          = jmodels.jDateTimeField(auto_now_add=True, verbose_name='تاریخ عضویت')
+    joined_at          = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ عضویت')
 
     objects = AllUser()
 

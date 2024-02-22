@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-9ywcq73u6ermca3nf@+i542!bs=iynzdl3v)#4x0j3t1d8v^uh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -45,13 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    "django_mongoengine",
-    "rest_framework_mongoengine",
+    # "django_mongoengine",
+    # "rest_framework_mongoengine",
     
     'rest_framework',
     'rest_framework_simplejwt',
     
-    'django_filters',
+    # 'django_filters',
     
     # 'django_celery_beat',
     # 'django_celery_results',
@@ -176,11 +176,11 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'my_score_db',
+        'NAME': 'postgres',
         'USER': 'postgres',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        # TODO : change the password before test it!
-        'PASSWORD': 'mehdi#12345',
+        'PORT': '5432',
     },
     # TODO: use Mongodb to store data, that comes from GEOLocation via API call
     # 'locations': {
@@ -197,13 +197,16 @@ DATABASES = {
 
 
 # TODO : MONGODB configurations
-MONGO_USER = 'mongouser'
-MONGO_PASS = 'password'
-MONGO_HOST = 'locahost'
-MONGO_NAME = 'themongodb'
-MONGO_DATABASE_HOST = '''mongodb://%s:%s@%s/%s''' % (MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_NAME)
-mongoengine.connect(MONGO_NAME, host=MONGO_DATABASE_HOST)
-
+# MONGO_USER = 'admin'
+# MONGO_PASS = 'password'
+# MONGO_HOST = '127.0.0.1:27017'
+# MONGO_NAME = 'themongodb'
+# MONGODB_DATABASES = {'items': 'iscore'}
+# MONGO_DATABASE_HOST = '''mongodb://%s:%s@%s/%s''' % (MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_NAME)
+# mongoengine.connect(MONGO_NAME, host=MONGO_DATABASE_HOST)
+# mongoengine.connect(MONGO_NAME, host=f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}/{MONGO_NAME}')
+mongoengine.connect(db="iscore", host="mongodb://127.0.0.1")
+# mongoengine.connect(db="iscore", host="mongo")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -226,7 +229,7 @@ REST_FRAMEWORK = {
     ],
     
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
+        # 'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],

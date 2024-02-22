@@ -81,15 +81,15 @@ class VisitorCreatProductAPIView(generics.GenericAPIView):
         pass
 
 
-class SearchProduct(generics.ListAPIView):
-    """
-    An endpoint for Users to find specific products
-    """
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = [ProductSerializer]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['title', 'prod_type', 'is_exisited', 'is_verified', 'price', 'capacity']
-
+# class SearchProduct(generics.ListAPIView):
+#     """
+#     An endpoint for Users to find specific products
+#     """
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = [ProductSerializer]
+#     filter_backends = [filters.SearchFilter]
+#     search_fields = ['title', 'prod_type', 'is_exisited', 'is_verified', 'price', 'capacity']
+#
 
 class AllInstanceAPIView(generics.GenericAPIView):
     """

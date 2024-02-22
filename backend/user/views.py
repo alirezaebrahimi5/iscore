@@ -210,31 +210,31 @@ class VerifyOTPAPIView(generics.GenericAPIView):
         else:
             return response.Response(data=s.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ResetPasswordConfirmAPIView(generics.GenericAPIView):
-    """
-    An endpoint for Users to reset their password
-    """
-    permission_classes = []
-    serializer_class = [ResetPassowrdSerializer]
-    
-    def get(self, request, *args, **kwargs):
-        return response.Response()
-    
-    def post(self, request, *args, **kwargs):
-        s = ResetPassowrdSerializer(data=request.data)
-        return response.Response()
+#
+# class ResetPasswordConfirmAPIView(generics.GenericAPIView):
+#     """
+#     An endpoint for Users to reset their password
+#     """
+#     permission_classes = []
+#     serializer_class = [ResetPassowrdSerializer]
+#
+#     def get(self, request, *args, **kwargs):
+#         return response.Response()
+#
+#     def post(self, request, *args, **kwargs):
+#         s = ResetPassowrdSerializer(data=request.data)
+#         return response.Response()
 
 
 ############################ TODO : Sale managers ############################
 
 
-class SeeAllPersonnelAPIView(generics.GenericAPIView):
-    """
-    An endpoint for Sale managers to see the other users info
-    """
-    
-    permission_classes = [IsSales_ManagerUser, IsManagementUser]
-    serializer_class = [CustomUserSerializer]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['identificationCode', 'mobile', 'fullName', 'phone']
+# class SeeAllPersonnelAPIView(generics.GenericAPIView):
+#     """
+#     An endpoint for Sale managers to see the other users info
+#     """
+#
+#     permission_classes = [IsSales_ManagerUser, IsManagementUser]
+#     serializer_class = [CustomUserSerializer]
+#     filter_backends = [filters.SearchFilter]
+#     search_fields = ['identificationCode', 'mobile', 'fullName', 'phone']

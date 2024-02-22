@@ -1,6 +1,6 @@
 import pyotp 
 
-from sms_ir import SmsIr
+# from sms_ir import SmsIr
 
 
 def sendToken(user):

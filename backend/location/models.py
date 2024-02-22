@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from mongoengine import *
+from mongoengine import DynamicDocument, fields, Document
 
 
 User = settings.AUTH_USER_MODEL

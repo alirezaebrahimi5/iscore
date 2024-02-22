@@ -11,7 +11,7 @@ urlpatterns = [
     path('login/otp/', CheckOTPAPIView.as_view(), name='otp-login'),
     path('logout/', UserLogoutAPIView.as_view(), name='logout'),
     path('profile/', UserProfileAPIView.as_view(), name='profile'),
-    path('remember-me/', TokenRefreshView.as_view(), name='refresh'),
+    path('refresh/', TokenRefreshView.as_view(), name='refresh'),
     path('verify-token/', TokenVerifyView.as_view(), name='verify-token'),
     
     # TODO : Registration
@@ -19,10 +19,10 @@ urlpatterns = [
     path('register/otp/', ActivateAccountAPIView.as_view(), name='otp-register'),
     
     # TODO : Reset password
-    path('reset/password/', GetUserIDNAPIView.as_view(), name='reset'),
-    path('reset/password/otp/', VerifyOTPAPIView.as_view(), name='otp-reset'),
-    path('reset/password/confirm/', ResetPasswordConfirmAPIView.as_view(), name='confirm'),
+    # path('reset/password/', GetUserIDNAPIView.as_view(), name='reset'),
+    # path('reset/password/otp/', VerifyOTPAPIView.as_view(), name='otp-reset'),
+    # path('reset/password/confirm/', ResetPasswordConfirmAPIView.as_view(), name='confirm'),
     
     # TODO : Sale manager
-    path('sale-manager-access-users/', SeeAllPersonnelAPIView.as_view()),
+    # path('sale-manager-access-users/', SeeAllPersonnelAPIView.as_view()),
 ]
