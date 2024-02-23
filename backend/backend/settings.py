@@ -176,10 +176,10 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'test',
         'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
+        'PASSWORD': 'admin',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     },
     # TODO: use Mongodb to store data, that comes from GEOLocation via API call
@@ -219,9 +219,9 @@ REST_FRAMEWORK = {
     ],
     
     'DEFAULT_THROTTLE_RATES': {
-        'anon':'2/day',
-        'user':'5/hour',
-        'custom':'3/minute'
+        'anon':'10/minutes',
+        'user':'100/minute',
+        'custom':'1000/hour'
     },
     
     'DEFAULT_RENDERER_CLASSES': [
@@ -239,6 +239,7 @@ REST_FRAMEWORK = {
     # ],
 }
 
+APPEND_SLASH=False
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (

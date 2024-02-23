@@ -7,16 +7,16 @@ from .models import User, Profile
 
 @admin.register(User)
 class Admin(UserAdmin):
-    list_display = ('identificationCode', 'first_name', 'last_name', 'mobile', 'role')
+    list_display = ('nid', 'mobile')
     filter_horizontal = ()
     list_filter = (
-        ('joined_at', JDateFieldListFilter), 'is_active', 'role'
+        ('joined_at', JDateFieldListFilter), 'is_active'
     )
     fieldsets = ()
-    search_fields = ('identificationCode', 'first_name', 'last_name', 'mobile')
-    ordering = ('joined_at', 'role')
+    search_fields = ('nid', 'mobile')
+    ordering = ('joined_at',)
 
 
 @admin.register(Profile)
 class PAdmin(admin.ModelAdmin):
-    list_display = ['user', 'mobile', 'phone', 'fullName']
+    list_display = ['user', 'fullName']

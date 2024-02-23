@@ -6,14 +6,14 @@ from .models import User, Profile
 def create_profile(sender, instance, created, **kwargs):
     if created:
         user=instance
+        if user.is_active and user.is_staff and user.is_superuser:
+            role = 1
+        else:
+            role = 7
+
         new_profile = Profile.objects.create(
             user=user,
-            mobile= user.mobile,
-            phone= user.phone,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            role=user.role,
-            pic=user.profile_pic,
+            role = role
         )
         
 

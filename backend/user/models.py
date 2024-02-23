@@ -7,24 +7,17 @@ from django.contrib.auth.models import (
 
 
 class AllUser(BaseUserManager):
-    def create_user(self, mobile, email, password=None, first_name=None, last_name=None, **kwargs):
-        if not email:
-            raise ValueError('کاربر باید پست الکترونیکی داشته باشد')
-        
+    def create_user(self, nid, mobile, password=None, **kwargs):
+
         if not mobile:
             raise ValueError('کاربر باید شماره تلفن داشته باشد')
         
-        if not first_name:
-            raise ValueError('کاربر باید شماره نام داشته باشد')
-        
-        if not last_name:
-            raise ValueError('کاربر باید شماره نام خانوادگی داشته باشد')
+        if not nid:
+            raise ValueError('کاربر باید کدملی داشته باشد')
 
         user = self.model(
-            email=self.normalize_email(email),
+            nid=nid,
             mobile=mobile,
-            first_name=first_name,
-            last_name=last_name,
             **kwargs,
         )
         user.is_active = False
@@ -32,13 +25,11 @@ class AllUser(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_staff(self, mobile, email, password, first_name, last_name):
+    def create_staff(self, nid, mobile, password):
         user = self.create_user(
-            email=email,
             mobile=mobile,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
+            nid=nid
         )
         user.is_staff = True
         user.is_active  = False
@@ -46,13 +37,11 @@ class AllUser(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, mobile, email, password, first_name, last_name):
+    def create_superuser(self, nid, mobile, password):
         user = self.create_user(
-            email=email,
             mobile=mobile,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
+            nid=nid
         )
         user.is_staff = True
         user.is_active  = True
@@ -84,30 +73,20 @@ class Role:
 class User(AbstractBaseUser):
     alphanumeric       = RegexValidator(r'^[0-9a-zA-Z]*$', message='فقط نمادهای الفبایی و اعداد پذیرفته میشوند')
     numbers            = RegexValidator(r'^[0-9a]*$', message='تنها اعداد پذیرفته میشوند')
-    identificationCode = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره ملی')
+    nid = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره ملی')
     mobile             = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره همراه')
-    first_name         = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
-    last_name          = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
-    phone              = models.CharField(max_length=11, unique=True, validators=[numbers], verbose_name='شماره تماس')
-    address            = models.CharField(max_length=4096, null=True, blank=True, verbose_name = '')
-    profile_pic        = models.ImageField(upload_to='user/', default='pic1.jpg')
     is_active          = models.BooleanField(default=False, null=False, verbose_name='وضعیت فعالیت')
     is_staff           = models.BooleanField(default=False, null=False, verbose_name='دسترسی ادمین')
     is_superuser       = models.BooleanField(default=False, null=False, verbose_name='مدیر')
-    role               = models.PositiveSmallIntegerField(choices=Role.ROLES, default=7)
     joined_at          = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ عضویت')
 
     objects = AllUser()
 
-    USERNAME_FIELD  = 'identificationCode'
-    REQUIRED_FIELDS = ['mobile', 'phone', 'first_name', 'last_name']
-    
-    @property
-    def fullName(self):
-        return str(self.first_name) + " " + str(self.last_name)
-    
+    USERNAME_FIELD  = 'nid'
+    REQUIRED_FIELDS = ['mobile']
+
     def __str__(self) -> str:
-        return f"{self.identificationCode}"
+        return f"{self.nid}"
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -121,7 +100,8 @@ class User(AbstractBaseUser):
 
 
 class OTP(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_otp")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_otp")
+    counter = models.IntegerField(default=3)
     otp  = models.CharField(max_length=6, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -131,16 +111,15 @@ class OTP(models.Model):
 
 class Profile(models.Model):
     user       = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='کاربر')
-    mobile     = models.CharField(max_length=11)
-    phone      = models.CharField(max_length=11, verbose_name='شماره تماس')
-    first_name = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
-    last_name  = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
-    pic        = models.ImageField(upload_to='profile/')
-    role       = models.PositiveSmallIntegerField()
-    
+    first_name         = models.CharField(max_length=30, null=True, blank=True, verbose_name='نام')
+    last_name          = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
+    address            = models.CharField(max_length=4096, null=True, blank=True, verbose_name = '')
+    pic        = models.ImageField(upload_to='profile/', null=True, blank=True, verbose_name = 'عکس پروفایل')
+    role       = models.PositiveSmallIntegerField(default=0, verbose_name='نقش کاربر')
+
     @property
     def fullName(self):
         return str(self.first_name) + " " + str(self.last_name)
     
     def __str__(self) -> str:
-        return f"{self.user} {self.phone} {self.mobile} {self.role}"
+        return f"{self.user} {self.role}"

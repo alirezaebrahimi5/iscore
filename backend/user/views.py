@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from django.conf import settings
+from django.utils import timezone
 
 from rest_framework import permissions, response, status, generics, filters
 from rest_framework_simplejwt import tokens
-
+from django.shortcuts import get_object_or_404
 from .models import User, OTP
 from .permissions import *
 from .serializers import *
@@ -24,13 +27,19 @@ class UserLoginAPIView(generics.GenericAPIView):
     serializer_class = [LoginUserSerializer]
 
     def post(self, request, *args, **kwargs):
-        s = LoginUserSerializer(data=request.data)
-        if s.is_valid():
-            idn = s.validated_data["identificationCode"]
-            user = User.objects.get(identificationCode=idn)
-            otp_token = sendToken(user=user)
-            OTP.objects.create(user=user,otp=otp_token).save()
-        return response.Response(s.data, status=status.HTTP_200_OK)
+        serializer = LoginUserSerializer(data=request.data)
+        if serializer.is_valid():
+            nid = serializer.validated_data["nid"]
+            user = get_object_or_404(User, nid=nid)
+            result = sendToken(user=user)
+            otp = result['otp']
+            error = result['error']
+            if otp:
+                print(f"The OTP is : {otp}")
+                return response.Response({"mobile": user.mobile[-4:]}, status=status.HTTP_200_OK)
+            else:
+                return response.Response({"waite": error}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CheckOTPAPIView(generics.GenericAPIView):
@@ -39,23 +48,33 @@ class CheckOTPAPIView(generics.GenericAPIView):
     """
     
     def post(self, request, *args, **kwargs):
-        deleteOTP(request.user)
-        s = OTPSerializer(data=request.data)
-        if s.is_valid():
-            otp = s.validated_data["otp"]
-            if OTP.objects.get(otp=otp):
-                # TODO : `uo` is stands for User OTP
-                uo = OTP.objects.get(otp=otp)
-                user = User.objects.get(phone=uo.user)
-                token = tokens.RefreshToken.for_user(user)
-                data = s.data
-                data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}                
-                uo.delete()
-                return response.Response(data, status=status.HTTP_205_RESET_CONTENT)
+        serializer = OTPSerializer(data=request.data)
+        if serializer.is_valid():
+            otp = serializer.validated_data["otp"]
+            nid = serializer.validated_data["nid"]
+            # TODO : `uo` is stands for User OTP
+            uo = get_object_or_404(OTP, user__nid=nid)
+            counter = uo.counter
+            if uo.otp == otp and counter > 0:
+                access_time = (datetime.timedelta(minutes=10) + otp.created_at).timestamp()
+                delta_time = access_time - timezone.now().timestamp()
+                if delta_time > 0:
+                    user = uo.user
+                    token = tokens.RefreshToken.for_user(user)
+                    data = {"refresh": str(token), "access": str(token.access_token)}
+                    uo.delete()
+                    return response.Response(data, status=status.HTTP_205_RESET_CONTENT)
+                else:
+                    uo.delete()
             else:
-                return response.Response(s.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+                if counter < 0:
+                    uo.delete()
+                else:
+                    uo.counter -= 1
+                    uo.save()
+            return response.Response({'error': "Token has been expired"}, status=status.HTTP_408_REQUEST_TIMEOUT)
         else:
-            return response.Response(s.errors, status=status.HTTP_408_REQUEST_TIMEOUT)
+            return response.Response(serializer.errors, status=status.HTTP_408_REQUEST_TIMEOUT)
 
 
 class UserLogoutAPIView(generics.GenericAPIView):
@@ -175,8 +194,8 @@ class GetUserIDNAPIView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         s = UserIDSerializer(data=request.data)
         if s.is_valid():
-            idn = s.validated_data["identificationCode"]
-            user = User.objects.get(identificationCode=idn)
+            idn = s.validated_data["nid"]
+            user = User.objects.get(nid=idn)
             if user is not None:
                 otp = sendToken(user=user)
                 OTP.objects.create(user=user,otp=otp).save()
@@ -237,4 +256,4 @@ class VerifyOTPAPIView(generics.GenericAPIView):
 #     permission_classes = [IsSales_ManagerUser, IsManagementUser]
 #     serializer_class = [CustomUserSerializer]
 #     filter_backends = [filters.SearchFilter]
-#     search_fields = ['identificationCode', 'mobile', 'fullName', 'phone']
+#     search_fields = ['nid', 'mobile', 'fullName', 'phone']

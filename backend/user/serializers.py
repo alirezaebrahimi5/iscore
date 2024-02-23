@@ -12,19 +12,19 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("pk", "phone", "identificationCode", "mobile", "first_name", "last_name",
+        fields = ("pk", "phone", "nid", "mobile", "first_name", "last_name",
                   "address", "profile_pic", "role")
 
 
 class LoginUserSerializer(serializers.Serializer):
-    identificationCode   = serializers.CharField()
+    nid   = serializers.CharField()
     password             = serializers.CharField(required=False)
 
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User 
-        fields =['pk', 'identificationCode', 'mobile', 'phone', 'first_name', 'last_name',
+        fields =['pk', 'nid', 'mobile', 'phone', 'first_name', 'last_name',
                  'address', "profile_pic", 'role']
     
     def create(self, **validated_data):
@@ -42,15 +42,15 @@ class OTPSerializer(serializers.Serializer):
     Serializer class for getting OTP from Users
     """
     otp = serializers.CharField()
-    phone = serializers.CharField(required=False)
+    nid = serializers.CharField(required=False)
 
 
 class UserIDSerializer(serializers.Serializer):
-    identificationCode = serializers.CharField()
+    nid = serializers.CharField()
     
     def validate(self, data):
-        if User.objects.filter(identificationCode__exact=self.identificationCode):
-            return response.Response(self.identificationCode, status=status.HTTP_200_OK)
+        if User.objects.filter(nid__exact=self.nid):
+            return response.Response(self.nid, status=status.HTTP_200_OK)
         return serializers.ValidationError("!این شماره ملی ثبت نشده است")
 
 
